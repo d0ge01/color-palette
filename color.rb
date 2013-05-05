@@ -8,10 +8,13 @@ class ColorPalette
 	
 	@@DEBUG = true
 	
+	# Strings
+	
+	@html = String.new
     def initialize(url)
         url = check_url(url)
 		puts "Inizialized with url: #{url}..." if @@DEBUG
-		@@site_name = URI.parse(url).host
+		@@site_name = URI.parse(url).host.split('.').join('dot')
         # hashmap with store color -> # of appearances
         @color_map = Hash.new
         urls = get_stylesheet_urls(url)
@@ -120,26 +123,31 @@ class ColorPalette
     end
 
     def print_palette_html
-        file = File.new("#{@@site_name}.html", "w+")
-        file.puts "<html>"
-        file.puts "<title>#{@@site_name} Color Page</title>"
-        file.puts "<body>"
-        file.puts "<table>"
-        file.puts "<tr>"
-        file.puts "<th> Color </th>"
-        file.puts "<th> Hex </th>"
-        file.puts "<th> Frequency </th>"
-        file.puts "</tr>"
-        @color_map.each{|key, value|
-            file.puts "<tr>"
-            file.puts "<td style='width:50px; height:50px; background-color: #{key}'></td>"
-            file.puts "<td> #{key} </td>"
-            file.puts "<td> #{value} </td>"
-            file.puts "</tr>"
+		# Use string interpolation + Array Injection instead hundreds puts
+		@html = ["<html>\n",
+				"\t<head>\n",
+				"\t\t<title>#{@@site_name} report</title>\n",
+				"\t</head>\n",
+				"\t<body>\n",
+				"\t\t<table>\n",
+				"\t\t\t<tr>\n",
+				"\t\t\t<td>Color</td>\n",
+				"\t\t\t<td>Hex</td>\n",
+				"\t\t\t<td>Frequency</td>\n",
+				"\t\t\t</tr>\n"]
+		@color_map.each{|key, value|
+            @html << "\t\t\t<tr>\n"
+            @html << "\t\t\t<td style='width:50px; height:50px; background-color: #{key}'></td>\n"
+            @html << "<td> #{key} </td>\n"
+            @html << "<td> #{value} </td>\n"
+            @html << "</tr>\n"
         }
-        file.puts "</body>"
-        file.puts "</html>"
-		puts "File html generated.." if @@DEBUG
+		@html << "\t\t</table>\n"
+		@html << "\t</body>\n"
+        @html << "</html>\n"
+        file = File.new("#{@@site_name}.html", "w+")
+		file.puts(@html.inject{|sum,x| sum + x})
+		puts "File #{@@site_name}.html generated.." if @@DEBUG
     end
 
     def print_color_palette
