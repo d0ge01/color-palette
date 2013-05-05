@@ -10,7 +10,11 @@ class ColorPalette
 	
 	# Strings
 	
-	@html = String.new
+	@@notValidUrl = "Not a valid link. Try another one."
+	@@outputHtmlTileSize = "width:50px; height:50px;"
+	
+	
+	@html = Array.new
     def initialize(url)
         url = check_url(url)
 		puts "Inizialized with url: #{url}..." if @@DEBUG
@@ -52,7 +56,7 @@ class ColorPalette
             begin
                 page_source = Nokogiri::HTML(open(css_url)).text 
             rescue
-                puts "Did not pull any colors from badly formed url:\n"+css_url
+                puts @@notValidUrl+css_url
                 next
             end
             page_source = Nokogiri::HTML(open(css_url)).text 
@@ -137,7 +141,7 @@ class ColorPalette
 				"\t\t\t</tr>\n"]
 		@color_map.each{|key, value|
             @html << "\t\t\t<tr>\n"
-            @html << "\t\t\t<td style='width:50px; height:50px; background-color: #{key}'></td>\n"
+            @html << "\t\t\t<td style='#{@@outputHtmlTileSize} background-color: #{key}'></td>\n"
             @html << "<td> #{key} </td>\n"
             @html << "<td> #{value} </td>\n"
             @html << "</tr>\n"
