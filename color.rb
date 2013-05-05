@@ -5,9 +5,13 @@ class ColorPalette
 
     @@site_name
 
+	
+	@@DEBUG = true
+	
     def initialize(url)
         url = check_url(url)
-        @@site_name = URI.parse(url).host
+		puts "Inizialized with url: #{url}..." if @@DEBUG
+		@@site_name = URI.parse(url).host
         # hashmap with store color -> # of appearances
         @color_map = Hash.new
         urls = get_stylesheet_urls(url)
@@ -55,7 +59,7 @@ class ColorPalette
             # group 5: a color (as an English word -- ex. white)
             color_array = page_source.scan(/color\s*:\s*(#[0-9A-Fa-f]{3,6}+)\s*|rgba?\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*|color\s*:\s*(white|aqua|black|blue|fuchsia|gray|green|lime|maroon|navy|olive|orange|purple)/)
             color_array.each{|color|
-                #puts color.inspect
+                puts color.inspect if @@DEBUG
                 if color[0] != nil
                     color = color[0].downcase
                     color = expand_hex(color) if color.length == 4 # usually length 3 but including '#' so use length 4
@@ -68,7 +72,7 @@ class ColorPalette
                     hex_color = get_hex(color)
                     color = hex_color if hex_color != nil # try to assign a hex value, if not, will remain as is.
                 end
-                #puts color
+                puts color if @@DEBUG
                 if @color_map[color] == nil
                     @color_map[color] = 1   
                 else
@@ -135,6 +139,7 @@ class ColorPalette
         }
         file.puts "</body>"
         file.puts "</html>"
+		puts "File html generated.." if @@DEBUG
     end
 
     def print_color_palette
