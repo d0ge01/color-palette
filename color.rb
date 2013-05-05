@@ -12,7 +12,7 @@ class ColorPalette
 	
 	@@notValidUrl = "Not a valid link. Try another one."
 	@@outputHtmlTileSize = "width:50px; height:50px;"
-	
+	@@badCss = "Did not pull any colors from badly formed url:\n"
 	
 	@html = Array.new
     def initialize(url)
@@ -37,7 +37,7 @@ class ColorPalette
         begin
             page = Nokogiri::HTML(open(url))      
         rescue
-            abort("Not a valid link. Try another one.")
+            abort(@@notValidUrl)
         end
         page.css('head').css('link[rel=stylesheet]').each {|stylesheet|
             if !stylesheet['href'].start_with? '/' 
@@ -56,7 +56,7 @@ class ColorPalette
             begin
                 page_source = Nokogiri::HTML(open(css_url)).text 
             rescue
-                puts @@notValidUrl+css_url
+                puts @@badCss+css_url
                 next
             end
             page_source = Nokogiri::HTML(open(css_url)).text 
